@@ -1,54 +1,54 @@
 import express from "express";
 import cors from "cors";
-import http from "http"; // Import the http module
+import http from "http";
 import dotenv from "dotenv";
 import dbConnect from "./config/dbConnect.js";
 import { Server } from "socket.io";
 
-
-
-
-// configuring dotenv
+// Configuring dotenv
 dotenv.config();
-// connect to db
+
+// Connect to the database
 dbConnect();
 
 const app = express();
-const server = http.createServer(app); // Create an http server
-const io = new Server(server, {
-    cors:{
-        origin: 'https://crmgh.vercel.app',
-        methods: ["POST", "GET", "PUT", "DELETE"],
-    },
-}); // Pass the http server to Socket.io
 
-app.use(cors());
-app.use(express.json({limit: '25mb'}));
+// Set up CORS middleware
+app.use(cors({
+  origin: 'https://crmgh.vercel.app', // Allow requests from this origin
+  methods: ["POST", "GET", "PUT", "DELETE"] // Allow these HTTP methods
+}));
 
-io.on("connection", (socket)=>{
+// Set up JSON parsing middleware
+app.use(express.json({ limit: '25mb' }));
+
+// Create an HTTP server
+const server = http.createServer(app);
+
+// Create a Socket.IO server and pass the HTTP server
+const io = new Server(server);
+
+// Socket.IO connection event
+io.on("connection", (socket) => {
     console.log(`${socket.id} connected`);
+
     // Handle events here
     socket.on("disconnect", () => {
         console.log("User disconnected");
     });
     
-    // events
-
-    socket.on('login',async ()=>{
-        
+    // Handle login event
+    socket.on('login', async () => {
         socket.emit('loggedIn', {
-            message: "User logged in succesfully",
-        })
-        
-    })
-    
-})
+            message: "User logged in successfully",
+        });
+    });
+});
 
+// Listening to port
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+    console.log("Server is running on port", port);
+});
 
-
-
-// listening to port
-const port = process.env.PORT;
-server.listen(port, ()=>{console.log("server is running on port", port)})
-
-export { io }
+export { io };
