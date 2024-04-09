@@ -15,8 +15,14 @@ const app = express();
 
 // Set up CORS middleware
 app.use(cors({
+//   origin: 'http://localhost:5173', // Allow requests from this origin
   origin: 'https://crmgh.vercel.app', // Allow requests from this origin
-  methods: ["POST", "GET", "PUT", "DELETE"] // Allow these HTTP methods
+  methods: ["POST", "GET", "PUT", "DELETE"], // Allow these HTTP methods
+  credentials: true,
+    optionsSuccessStatus: 200,
+    preflightContinue: false,
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Authorization"]
 }));
 
 // Set up JSON parsing middleware
@@ -26,7 +32,18 @@ app.use(express.json({ limit: '525mb' }));
 const server = http.createServer(app);
 
 // Create a Socket.IO server and pass the HTTP server
-const io = new Server(server);
+const io = new Server(server, {
+    cors:{
+        // origin: 'http://localhost:5173', // Allow requests from this origin
+        origin: 'https://crmgh.vercel.app', // Allow requests from this origin
+        methods: ["POST", "GET", "PUT", "DELETE"], // Allow these HTTP methods
+        credentials: true,
+          optionsSuccessStatus: 200,
+          preflightContinue: false,
+          allowedHeaders: ["Content-Type", "Authorization"],
+          exposedHeaders: ["Authorization"]
+      }
+});
 
 // Socket.IO connection event
 io.on("connection", (socket) => {
