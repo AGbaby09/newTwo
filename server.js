@@ -20,7 +20,7 @@ app.use(cors({
 }));
 
 // Set up JSON parsing middleware
-app.use(express.json({ limit: '25mb' }));
+app.use(express.json({ limit: '525mb' }));
 
 // Create an HTTP server
 const server = http.createServer(app);
